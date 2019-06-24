@@ -1,0 +1,71 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="plotly-latest.min.js"></script>
+  <script src="jquery-3.2.1.min.js"></script>
+</head>
+<body>
+  <h1>Geiger Counter Measurements</h1>
+  <div id="plot-area" style="width:600px;height:400px;"></div>
+  <script>
+
+//      Alternative request using XHR
+//      var data = null;
+//      var xhr = new XMLHttpRequest();
+//      xhr.addEventListener("readystatechange", function () {
+//          if (this.readyState === 4) {
+//              console.log(this.responseText);
+//          }
+//      });
+//      xhr.open("GET", "http://www.phyordia.com/geigercounter/getdata.php");
+//      xhr.setRequestHeader("Authorization", "thisismykey");
+//      xhr.setRequestHeader("Cache-Control", "no-cache");
+//      xhr.send(data);
+
+
+//      JQuery ajax
+
+      var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "../api/getdata.php",
+          "method": "GET",
+          "headers": {
+              "Authorization": "thisismykey",
+              "Cache-Control": "no-cache",
+//              "Postman-Token": "e195282e-cacc-655d-2dd9-c10bd73858c7"
+          }
+      }
+
+      $.ajax(settings).done(function( msg ) {
+
+            msg = JSON.parse(msg);
+            var x = Array();
+            var y = Array();
+
+            msg.forEach(function(el){
+              if(el['type']=="daq"){
+                // console.log(el);
+                x.push(new Date(el['timestamp']*1000));
+                y.push(el['counts']);
+              }
+            });
+//            console.log(x);
+//            console.log(y);
+            plotarea = document.getElementById('plot-area');
+          	Plotly.plot( plotarea, [{
+            	x: x,
+            	y: y
+            }], {
+          	margin: { t: 10 } } );
+
+          })  .fail(function(msg) {
+              alert( "error" );
+              console.log(msg);
+          });
+
+
+
+</script>
+</body>
+</html>
